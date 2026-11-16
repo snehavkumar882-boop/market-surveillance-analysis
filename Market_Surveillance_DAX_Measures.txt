@@ -1,0 +1,100 @@
+MARKET SURVEILLANCE — POWER BI DAX MEASURES
+Model table name assumed: Market_Data
+Import Market_Surveillance_Analysis.xlsx > Market_Data sheet/table.
+If Power BI assigns a different table name, replace Market_Data in the formulas.
+
+1) Trading Days =
+COUNTROWS(Market_Data)
+
+2) Evaluated Days =
+CALCULATE(
+    COUNTROWS(Market_Data),
+    Market_Data[Surveillance_Flag] IN { "REVIEW", "NORMAL" }
+)
+
+3) Review Alerts =
+CALCULATE(
+    COUNTROWS(Market_Data),
+    Market_Data[Surveillance_Flag] = "REVIEW"
+)
+
+4) Normal Days =
+CALCULATE(
+    COUNTROWS(Market_Data),
+    Market_Data[Surveillance_Flag] = "NORMAL"
+)
+
+5) Baseline Days =
+CALCULATE(
+    COUNTROWS(Market_Data),
+    Market_Data[Surveillance_Flag] = "BASELINE"
+)
+
+6) Alert Rate =
+DIVIDE([Review Alerts], [Evaluated Days], 0)
+
+7) Total Trading Volume =
+SUM(Market_Data[Trading_Volume])
+
+8) Average Trading Volume =
+AVERAGE(Market_Data[Trading_Volume])
+
+9) Highest Trading Volume =
+MAX(Market_Data[Trading_Volume])
+
+10) Average Volume Ratio =
+AVERAGEX(
+    FILTER(Market_Data, Market_Data[Surveillance_Flag] IN { "REVIEW", "NORMAL" }),
+    Market_Data[Volume_Ratio]
+)
+
+11) Maximum Volume Ratio =
+MAX(Market_Data[Volume_Ratio])
+
+12) Average Closing Price =
+AVERAGE(Market_Data[Closing_Price])
+
+13) Review Volume =
+CALCULATE(
+    SUM(Market_Data[Trading_Volume]),
+    Market_Data[Surveillance_Flag] = "REVIEW"
+)
+
+FORMATTING
+- Alert Rate: Percentage, 1 decimal place.
+- Average Volume Ratio and Maximum Volume Ratio: Decimal number, 2 decimal places.
+- Trading volume: Whole number with thousands separator.
+- Closing price: Currency or decimal, depending on the intended presentation.
+
+DASHBOARD BUILD
+Page title: Market Surveillance — Unusual Trading Activity
+
+KPI cards:
+- Trading Days
+- Evaluated Days
+- Review Alerts
+- Alert Rate
+- Average Trading Volume
+- Highest Trading Volume
+
+Visuals:
+1. Line chart: Date (X-axis), Trading_Volume (Y-axis).
+2. Line chart: Date (X-axis), Closing_Price (Y-axis).
+3. Clustered column chart: Date (X-axis), Volume_Ratio (Y-axis).
+4. Table: Date, Closing_Price, Trading_Volume, Average_Volume_5D,
+   Volume_Ratio, Price_Change_%, Surveillance_Flag.
+5. Slicer: Stock.
+6. Slicer: Surveillance_Flag.
+
+EXPECTED CHECKS FOR THIS SAMPLE DATA
+- Trading Days = 15
+- Evaluated Days = 10
+- Review Alerts = 2
+- Normal Days = 8
+- Baseline Days = 5
+- Alert Rate = 20% (2 / 10)
+- Review dates = 08-Nov-2026 and 09-Nov-2026
+
+IMPORTANT
+This is simulated data and a simple threshold-based screening example.
+A REVIEW flag is not proof of insider trading or market manipulation.
